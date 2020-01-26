@@ -2,12 +2,16 @@ int outputpins[10] = {49, 47, 45, 43, 41, 39, 37, 35, 33, 31};
 int inputpins[10] = {48, 46, 44, 42, 40, 38, 36, 34, 32, 30};
 int switchvalues[100]; 
 
-Stream& serialdata = Serial3; 
+Stream* pserialdata = NULL; //&Serial3; 
 Stream& serialdebug = Serial; 
+int datapin = 13; 
 
 void setup() {
   Serial.begin(115200); 
   Serial3.begin(115200); 
+  pinMode(datapin, OUTPUT); 
+  digitalWrite(datapin, 1); 
+
   for (int j = 0; j < 10; j++) {
       pinMode(outputpins[j], OUTPUT);
       digitalWrite(outputpins[j], LOW); 
@@ -60,19 +64,41 @@ void loop()
     }
     serialdebug.println(""); 
   }
-  if (nchanges || ((steadyframecount % 10) == 9)) {
-    serialdata.print(count); 
-    serialdata.write(": "); 
-    delay(1);  // allow the esp8266 uart buffer to keep up
-    for (int i = 0; i < 100; i++) {
-      serialdata.write(switchvalues[i] ? "1" : "0");  
+
+  if (pserialdata != NULL) {
+    if (nchanges || ((steadyframecount % 10) == 9)) {
+      pserialdata->print(count); 
+      pserialdata->write(": "); 
       delay(1);  // allow the esp8266 uart buffer to keep up
+      for (int i = 0; i < 100; i++) {
+        pserialdata->write(switchvalues[i] ? "1" : "0");  
+        delay(1);  // allow the esp8266 uart buffer to keep up
+      }
+      pserialdata->write("\n"); 
+      pserialdata->flush(); 
+      delay(20); // give time to process on other side anyway
+    } else {
+      delay(100); 
     }
-    serialdata.write("\n"); 
-    serialdata.flush(); 
-    delay(20); // give time to process on other side anyway
-  } else {
-    delay(100); 
+  }
+
+  // bitbash morse code of 100bits
+  if (datapin != 0) {
+    if (nchanges || ((steadyframecount % 10) == 9)) {
+      digitalWrite(datapin, 0); 
+      delay(50); 
+      digitalWrite(datapin, 1); 
+      delay(3); 
+      digitalWrite(datapin, 0); 
+      delay(5); 
+      for (int i = 0; i < 100; i++) {
+        digitalWrite(datapin, 1); 
+        delay(switchvalues[i] ? 3 : 1); 
+        digitalWrite(datapin, 0); 
+        delay(2); 
+      }
+      digitalWrite(datapin, 1); 
+    }
   }
 
   if (nchanges) 

@@ -7,7 +7,7 @@ def updateconfig(c="config.txt"):
             for x in fin:
                 print(x.strip())
         y = input("input line> ")
-        ys = y.split()
+        ys = y.strip().split(None, 1)
         if not 1 <= len(ys) <= 2:
             return
         cd = "E"+c
@@ -15,7 +15,7 @@ def updateconfig(c="config.txt"):
             with open(c) as fin:
                 x = None
                 for x in fin:
-                    xs = x.split()
+                    xs = x.strip().split(None, 1)
                     if ys is not None and ys[0] == xs[0]:
                         if len(ys) == 2:
                             fout.write(y)
