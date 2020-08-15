@@ -1,3 +1,6 @@
+// Select board Arduino Mega 2560
+// dipswitches 1-4 up, 5-7 down, 8 down
+
 int outputpins[10] = {49, 47, 45, 43, 41, 39, 37, 35, 33, 31};
 int inputpins[10] = {48, 46, 44, 42, 40, 38, 36, 34, 32, 30};
 int switchvalues[100]; 
