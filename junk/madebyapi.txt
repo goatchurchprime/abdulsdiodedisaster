@@ -1,2 +1,4 @@
 file
+contents2file
 contents2
+ding ding!
